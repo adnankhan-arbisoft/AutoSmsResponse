@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class DataHolder {
 
@@ -35,7 +36,7 @@ public class DataHolder {
         return instance;
     }
 
-    public List<Model> getModelList() {
+    public List<Model> getModels() {
 
         Type listType = new TypeToken<List<Model>>() {}.getType();
 
@@ -46,11 +47,9 @@ public class DataHolder {
         return modelList != null ? modelList : new ArrayList<Model>();
     }
 
-    public void saveModelList(List<Model> modelList) {
+    public void saveModels(Set<Model> models) {
 
-        Type listType = new TypeToken<List<Model>>() {}.getType();
-
-        String json = gson.toJson(modelList);
+        String json = gson.toJson(models);
 
         preferences.edit().putString(PREFS_KEY_MODELS_LIST, json).apply();
     }

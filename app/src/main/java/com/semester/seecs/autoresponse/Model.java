@@ -1,8 +1,15 @@
 package com.semester.seecs.autoresponse;
 
-import java.io.Serializable;
+import android.support.annotation.NonNull;
 
-public class Model implements Serializable{
+import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+
+public class Model implements Serializable, Comparable<Model>{
+   private String uniqueID;
    private Time startTime;
    private Time endTime;
    private String message;
@@ -13,9 +20,11 @@ public class Model implements Serializable{
         this.endTime = endTime;
         this.message = message;
         this.active = active;
+        uniqueID = UUID.randomUUID().toString();
     }
 
     public Model() {
+        uniqueID = UUID.randomUUID().toString();
     }
 
     public Time getStartTime() {
@@ -50,10 +59,38 @@ public class Model implements Serializable{
         this.active = active;
     }
 
+    public String getUniqueID() {
+        return uniqueID;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        Model model = (Model) o;
+
+        return uniqueID.equals(model.uniqueID);
+    }
+
+    @Override
+    public int hashCode() {
+        return uniqueID.hashCode();
+    }
+
+
+
     @Override
     public String toString() {
         return "Model{" + "startTime=" + startTime + ", endTime=" + endTime + ", message='" +
                 message + '\'' + ", active=" + active + '}';
+    }
+
+    @Override
+    public int compareTo(@NonNull Model model) {
+          return uniqueID.compareTo(model.getUniqueID());
     }
 
     public static class Time implements Serializable {
@@ -76,8 +113,40 @@ public class Model implements Serializable{
             this.minute = minute;
         }
 
-        public String getReadableTime(){
-            return hourOfDay+":"+minute;
+        public String getReadableTime() {
+
+            String _24HourTime = hourOfDay + ":" + minute;
+            try {
+                SimpleDateFormat _24HourSDF = new SimpleDateFormat("HH:mm");
+                SimpleDateFormat _12HourSDF = new SimpleDateFormat("hh:mm a");
+                Date _24HourDt = _24HourSDF.parse(_24HourTime);
+                return _12HourSDF.format(_24HourDt);
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return _24HourTime;
+            }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+
+            Time time = (Time) o;
+
+            if (hourOfDay != time.hourOfDay)
+                return false;
+            return minute == time.minute;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = hourOfDay;
+            result = 31 * result + minute;
+            return result;
         }
 
         @Override

@@ -59,7 +59,7 @@ public class MyPhoneStateListener extends PhoneStateListener {
 
     public List<Model> getActiveModelList(){
 
-        List<Model> modelList = DataHolder.getInstance(context).getModelList();
+        List<Model> modelList = DataHolder.getInstance(context).getModels();
         Iterator<Model> iterator = modelList.iterator();
         while (iterator.hasNext()) {
             Model model = iterator.next();

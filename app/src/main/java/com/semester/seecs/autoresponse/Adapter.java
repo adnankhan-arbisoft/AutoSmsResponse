@@ -9,10 +9,18 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
 
     private List<Model> modelList = new ArrayList<>();
+
+    private ItemClickListener itemClickListener;
+
+
+    public Adapter(ItemClickListener itemClickListener){
+        this.itemClickListener = itemClickListener;
+    }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -25,7 +33,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
 
-        Model model = modelList.get(position);
+        final Model model = modelList.get(position);
 
         String date =  model.getStartTime().getReadableTime()
                 + "\n To \n" + model.getEndTime().getReadableTime();
@@ -36,6 +44,13 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
 
         holder.status.setChecked(model.isActive());
 
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               itemClickListener.onItemClick(model);
+            }
+        });
+
     }
 
     @Override
@@ -43,14 +58,16 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
         return  modelList.size();
     }
 
-    public void setData(List<Model> modelList){
-        this.modelList = modelList;
+    public void setData(Set<Model> models){
+        modelList = new ArrayList<>(models);
         notifyDataSetChanged();
     }
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView time, message;
         public Switch status;
+
 
         public MyViewHolder(View view) {
             super(view);
@@ -58,5 +75,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
             message =  view.findViewById(R.id.message);
             status =  view.findViewById(R.id.status);
         }
+    }
+
+
+    public static interface ItemClickListener{
+        public void onItemClick(Model model);
     }
 }

@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,19 +15,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
-public class ListFragment extends Fragment {
+public class ListFragment extends Fragment implements Adapter.ItemClickListener {
 
     private static final int REQUEST_CODE = 22311;
 
     private RecyclerView recyclerView;
     private FloatingActionButton actionButton;
 
-    private List<Model> modelList = new ArrayList<>();
+    private Set<Model> modelSet = new TreeSet<Model>();
 
-    private Adapter adapter = new Adapter();
+    private Adapter adapter;
 
     private DataHolder dataHolder;
 
@@ -36,7 +35,8 @@ public class ListFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dataHolder = DataHolder.getInstance(getContext());
-        modelList = dataHolder.getModelList();
+        modelSet.addAll(dataHolder.getModels());
+        adapter = new Adapter(this);
     }
 
     @Nullable
@@ -59,22 +59,19 @@ public class ListFragment extends Fragment {
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fm = getFragmentManager();
-
-                FragmentTransaction ft = fm.beginTransaction();
-
-                CreateResponseFragment fragment = new CreateResponseFragment();
-
-                fragment.setTargetFragment(ListFragment.this, REQUEST_CODE);
-
-                ft.add(android.R.id.content, fragment).commit();
-
-                ft.addToBackStack(null);
-
+                addCreateResponseFragment(null);
             }
         });
         recyclerView.setAdapter(adapter);
-        adapter.setData(modelList);
+        adapter.setData(modelSet);
+    }
+
+    public void addCreateResponseFragment(Model model){
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        Fragment fragment = CreateResponseFragment.newInstance(model);
+        fragment.setTargetFragment(ListFragment.this, REQUEST_CODE);
+        ft.add(android.R.id.content, fragment).commit();
+        ft.addToBackStack(null);
     }
 
     @Override
@@ -84,9 +81,8 @@ public class ListFragment extends Fragment {
         if(resultCode == Activity.RESULT_OK){
 
           Model model = (Model) data.getSerializableExtra(CommonKeys.KEY_EXTRA_MODEL);
-          modelList.add(model);
-
-          adapter.setData(modelList);
+          modelSet.add(model);
+          adapter.setData(modelSet);
 
         }
 
@@ -95,6 +91,12 @@ public class ListFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        dataHolder.saveModelList(modelList);
+        dataHolder.saveModels(modelSet);
     }
+
+    @Override
+    public void onItemClick(Model model) {
+        addCreateResponseFragment(model);
+    }
+
 }
