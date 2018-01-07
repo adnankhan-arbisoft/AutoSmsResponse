@@ -119,6 +119,7 @@ public class ListFragment extends Fragment implements Adapter.ItemClickListener 
 
     @Override
     public void onStatusChange(Model model) {
+        modelSet.add(model);
         handler.postDelayed(postRunnable, 500);
     }
 
