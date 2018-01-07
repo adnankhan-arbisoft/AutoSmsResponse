@@ -3,6 +3,7 @@ package com.semester.seecs.autoresponse;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -26,10 +27,16 @@ public class ListFragment extends Fragment implements Adapter.ItemClickListener 
     private FloatingActionButton actionButton;
 
     private Set<Model> modelSet = new TreeSet<Model>();
-
     private Adapter adapter;
-
     private DataHolder dataHolder;
+
+    private Handler handler = new Handler();
+    private Runnable postRunnable= new Runnable() {
+        @Override
+        public void run() {
+            dataHolder.saveModels(modelSet);
+        }
+    };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,6 +81,8 @@ public class ListFragment extends Fragment implements Adapter.ItemClickListener 
         ft.addToBackStack(null);
     }
 
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -83,10 +92,12 @@ public class ListFragment extends Fragment implements Adapter.ItemClickListener 
           Model model = (Model) data.getSerializableExtra(CommonKeys.KEY_EXTRA_MODEL);
           modelSet.add(model);
           adapter.setData(modelSet);
+          handler.postDelayed(postRunnable, 500);
 
         }
 
     }
+
 
     @Override
     public void onDestroy() {
@@ -97,6 +108,18 @@ public class ListFragment extends Fragment implements Adapter.ItemClickListener 
     @Override
     public void onItemClick(Model model) {
         addCreateResponseFragment(model);
+    }
+
+    @Override
+    public void onItemRemove(Model model) {
+        modelSet.remove(model);
+        adapter.setData(modelSet);
+        handler.postDelayed(postRunnable, 500);
+    }
+
+    @Override
+    public void onStatusChange(Model model) {
+        handler.postDelayed(postRunnable, 500);
     }
 
 }

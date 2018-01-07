@@ -4,6 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -31,23 +33,36 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, int position) {
 
         final Model model = modelList.get(position);
 
         String date =  model.getStartTime().getReadableTime()
-                + "\n To \n" + model.getEndTime().getReadableTime();
+                + " To " + model.getEndTime().getReadableTime();
 
         holder.time.setText(date);
 
         holder.message.setText(model.getMessage());
 
         holder.status.setChecked(model.isActive());
+        holder.status.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                itemClickListener.onStatusChange(model);
+            }
+        });
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                itemClickListener.onItemClick(model);
+            }
+        });
+
+        holder.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                itemClickListener.onItemRemove(model);
             }
         });
 
@@ -67,6 +82,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView time, message;
         public Switch status;
+        public ImageView delete;
 
 
         public MyViewHolder(View view) {
@@ -74,11 +90,15 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
             time =  view.findViewById(R.id.time_duration);
             message =  view.findViewById(R.id.message);
             status =  view.findViewById(R.id.status);
+            delete = view.findViewById(R.id.delete);
+
         }
     }
 
 
     public static interface ItemClickListener{
         public void onItemClick(Model model);
+        public void onItemRemove(Model model);
+        public void onStatusChange(Model model);
     }
 }

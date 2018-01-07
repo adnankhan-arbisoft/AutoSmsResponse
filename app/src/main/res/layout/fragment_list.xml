@@ -16,10 +16,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_margin="16dp"
+        android:layout_margin="8dp"
         android:src="@drawable/ic_plus_sign"
         app:borderWidth="0dp"
         android:layout_alignParentRight="true"
+        app:backgroundTint="@color/colorPrimary"
         app:elevation="4dp"/>
 
 </RelativeLayout>

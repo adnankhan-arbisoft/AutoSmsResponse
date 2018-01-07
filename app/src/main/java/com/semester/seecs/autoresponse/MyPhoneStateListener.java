@@ -1,6 +1,8 @@
 package com.semester.seecs.autoresponse;
 
+import android.app.NotificationManager;
 import android.content.Context;
+import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
@@ -10,6 +12,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class MyPhoneStateListener extends PhoneStateListener {
 
@@ -33,6 +37,7 @@ public class MyPhoneStateListener extends PhoneStateListener {
                     for (Model model : models){
                         Log.d(TAG, model.toString());
                         sendSMS(incomingNumber, model.getMessage());
+                        showNotification(incomingNumber, model.getMessage());
                     }
 
                 }
@@ -90,6 +95,22 @@ public class MyPhoneStateListener extends PhoneStateListener {
         Date currentDate = Calendar.getInstance().getTime();
 
         return !(currentDate.before(startDate) || currentDate.after(endDate));
+    }
+
+    public void showNotification(String number, String message){
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.ic_launcher_foreground)
+                        .setContentTitle(number)
+                        .setContentText(message);
+
+
+        int mNotificationId = (int) (Math.random() *100);
+        // Gets an instance of the NotificationManager service
+        NotificationManager mNotifyMgr =
+                (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        // Builds the notification and issues it.
+        mNotifyMgr.notify(mNotificationId, builder.build());
     }
 
 }

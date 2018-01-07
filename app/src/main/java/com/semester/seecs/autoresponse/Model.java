@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
@@ -15,16 +16,19 @@ public class Model implements Serializable, Comparable<Model>{
    private String message;
    private boolean active;
 
+   private Date sortingTime;
+
     public Model(Time startTime, Time endTime, String message, boolean active) {
+        super();
         this.startTime = startTime;
         this.endTime = endTime;
         this.message = message;
         this.active = active;
-        uniqueID = UUID.randomUUID().toString();
     }
 
     public Model() {
         uniqueID = UUID.randomUUID().toString();
+        sortingTime = Calendar.getInstance().getTime();
     }
 
     public Time getStartTime() {
@@ -90,7 +94,7 @@ public class Model implements Serializable, Comparable<Model>{
 
     @Override
     public int compareTo(@NonNull Model model) {
-          return uniqueID.compareTo(model.getUniqueID());
+          return -1 * sortingTime.compareTo(model.sortingTime);
     }
 
     public static class Time implements Serializable {
